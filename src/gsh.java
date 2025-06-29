@@ -1,7 +1,6 @@
 import java.util.*;
 
 public class gsh {
-    // fix bugs and handle errors
     public static void main (String args[]) {
         shell();
     }
@@ -10,9 +9,9 @@ public class gsh {
         while (true) {
             System.out.print("> ");
             String ans = getInput();
-            if (ans.replace(" ", "").matches("license()")) {
+            if (ans.replace(" ", "").equals("license()")) {
                 System.out.println("NO WARRANTY OF ANY KIND IS PROVIDED!\ngsh is licensed under the GNU General Public License (GPL) v2.0");
-            } else if (ans.replace(" ", "").matches("exit()")) {
+            } else if (ans.replace(" ", "").equals("exit()")) {
                 System.exit(0);
             }else {
                 interpret(ans);
@@ -75,6 +74,10 @@ public class gsh {
             String current = tokens.get(0);
             tokens.remove(0);
             if (current.matches("echo")) {
+                if (tokens.isEmpty()) {
+                    System.err.println("gsh: Error! Expected value!");
+                    break;
+                }
                 current = tokens.get(0);
                 tokens.remove(0);
                 System.out.println(current);
@@ -87,6 +90,8 @@ public class gsh {
                         break;
                     }
                 }
+            } else {
+                System.err.println("gsh: Error! Invalid statement!");              
             }
         }
     }
