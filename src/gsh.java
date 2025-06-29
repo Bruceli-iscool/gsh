@@ -87,7 +87,7 @@ public class gsh {
                     if (current.matches(";")) {
                         continue;
                     } else {
-                        break;
+                        break; 
                     }
                 }
             } else {
