@@ -1,22 +1,17 @@
 import java.util.*;
 
 public class gsh {
+    private static List<String> history = new ArrayList<>();
     public static void main (String args[]) {
         shell();
     }
     private static void shell() {
-        System.out.println("gsh v0.1\nlicense() for license or exit() to exit the program or enter command.");
+        System.out.println("gsh v0.1\nlicense for license or quit to exit the program or enter command.");
         while (true) {
             System.out.print("> ");
             String ans = getInput();
-            if (ans.replace(" ", "").equals("license()")) {
-                System.out.println("NO WARRANTY OF ANY KIND IS PROVIDED!\ngsh is licensed under the GNU General Public License (GPL) v2.0");
-            } else if (ans.replace(" ", "").equals("exit()")) {
-                System.exit(0);
-            }else {
-                interpret(ans);
-            }
-            continue;
+            interpret(ans);
+            
         }
     }
     public static String getInput() {
@@ -25,6 +20,7 @@ public class gsh {
         return in.stripTrailing().stripLeading();
     }
     public static void interpret(String line) {
+        history.add(line);
         lex(line);
     }
     private static void lex(String line) {
@@ -73,7 +69,11 @@ public class gsh {
         while (!tokens.isEmpty()) {
             String current = tokens.get(0);
             tokens.remove(0);
-            if (current.matches("echo")) {
+            if (current.matches("license")) {
+                System.out.println("NO WARRANTY OF ANY KIND IS PROVIDED!\ngsh is licensed under the GNU General Public License (GPL) v2.0");
+            } else if (current.matches("quit")) {
+                System.exit(0);
+            }else if (current.matches("echo")) {
                 if (tokens.isEmpty()) {
                     System.err.println("gsh: Error! Expected value!");
                     break;
@@ -81,17 +81,22 @@ public class gsh {
                 current = tokens.get(0);
                 tokens.remove(0);
                 System.out.println(current);
-                if (!tokens.isEmpty()) { 
-                    current = tokens.get(0);
-                    tokens.remove(0);
-                    if (current.matches(";")) {
-                        continue;
-                    } else {
-                        break; 
-                    }
+            } else if (current.matches("history")){
+                for (String s:history) {
+                    System.out.println(s);
                 }
-            } else {
+            }else {
                 System.err.println("gsh: Error! Invalid statement!");              
+            }
+            if (tokens.isEmpty()) {
+                break;
+            }
+            current = tokens.get(0);
+            tokens.remove(0);
+            if (current.matches(";")) {
+                continue;
+            } else {
+                break; 
             }
         }
     }
