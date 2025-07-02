@@ -1,6 +1,7 @@
 import java.util.*;
-
+import java.io.File;
 public class gsh {
+    private static String currentDir = System.getProperty("user.dir");
     private static List<String> history = new ArrayList<>();
     public static void main (String args[]) {
         shell();
@@ -8,7 +9,7 @@ public class gsh {
     private static void shell() {
         System.out.println("gsh v0.1\nlicense for license or quit to exit the program or enter command.");
         while (true) {
-            System.out.print("> ");
+            System.out.print("gsh@ "+currentDir+ "> ");
             String ans = getInput();
             interpret(ans);
             
@@ -85,7 +86,27 @@ public class gsh {
                 for (String s:history) {
                     System.out.println(s);
                 }
-            }else {
+            } else if (current.matches("cd")) {
+	    		if (!tokens.isEmpty()) {
+	    			current= tokens.get(0);
+	    			tokens.remove(0);
+	    			if (current.matches(";")) {
+	    				currentDir = System.getProperty("user.dir");
+	    				continue;
+	    			} else {
+	    				File tempDir = new File(current);
+	    				if (tempDir.exists()&&tempDir.isDirectory()) {
+	    					currentDir = tempDir.getAbsolutePath();
+	    				} else {
+	    					System.err.println("gsh: Error! "+current+" is not a valid directory!");
+	    					break;
+	    				}
+	    			}
+	    		} else {
+	    			currentDir = System.getProperty("user.dir");
+	    			break;
+	    		}
+	    	} else {
                 System.err.println("gsh: Error! Invalid statement!");              
             }
             if (tokens.isEmpty()) {
