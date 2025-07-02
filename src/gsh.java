@@ -146,6 +146,9 @@ public class gsh {
                         case "mkdir":
                             mkdirHelp();
                             break;
+                        case "ls":
+                            lsHelp();
+                            break;
                         default:
                             System.out.println("gsh: Error! Invalid command!");
                             break;
@@ -155,7 +158,15 @@ public class gsh {
                     }
                     tokens.remove(0);
                 }
-            } else {
+            } else if (current.matches("ls")) {
+                File tempDir = new File(currentDir);
+                File[] contents = tempDir.listFiles();
+                if (contents != null) {
+                    for (File i : contents) {
+                        System.out.println(i.getName());
+                    }
+                }
+            }else {
                 System.err.println("gsh: Error! Invalid statement!");              
             }
             if (tokens.isEmpty()) {
@@ -183,5 +194,8 @@ public class gsh {
     }
     private static void mkdirHelp() {
         System.out.println("mkdir: creates a directory.\nUsage: mkdir [path]");
+    }
+    private static void lsHelp() {
+        System.out.println("ls: lists all files in the current working directory.\nUsage: ls [path]");
     }
 }
