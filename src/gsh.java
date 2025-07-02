@@ -95,9 +95,12 @@ public class gsh {
 	    				continue;
 	    			} else {
 	    				File tempDir = new File(current);
-	    				if (tempDir.exists()&&tempDir.isDirectory()) {
-	    					currentDir = tempDir.getAbsolutePath();
-	    				} else {
+	    				if (!tempDir.isAbsolute()) {
+	    					tempDir = new File (currentDir +File.separator+current);
+	    				} 
+                        if (tempDir.exists()&&tempDir.isDirectory()) {
+                            currentDir = tempDir.getAbsolutePath();
+                        } else {
 	    					System.err.println("gsh: Error! "+current+" is not a valid directory!");
 	    					break;
 	    				}
@@ -106,7 +109,53 @@ public class gsh {
 	    			currentDir = System.getProperty("user.dir");
 	    			break;
 	    		}
-	    	} else {
+	    	} else if (current.matches("mkdir")) {
+                if (tokens.isEmpty()) {
+                    System.out.println("gsh: Error! Expected argument!");
+                    break;
+                } else {
+                    current = tokens.get(0);
+                    tokens.remove(0);
+                    File tempDir = new File(current);
+                    if (!tempDir.isAbsolute()) {
+                        tempDir = new File(currentDir + File.separator + tempDir);
+                    }
+                    if (tempDir.mkdir()) {
+                        
+                    } else {    
+                        System.out.println("gsh: Error! Directory not created!");
+                        break;
+                    }
+                }
+            } else if (current.matches("help")) {
+                if (tokens.isEmpty()) {
+                    System.out.println("gsh: Error! Usage help [command]");
+                    break;
+                } else {
+                    current = tokens.get(0);
+                    switch (current) {
+                        case "cd":
+                            cdHelp();
+                            break;
+                        case "echo":
+                            echoHelp();
+                            break;
+                        case "history":
+                            historyHelp();
+                            break;
+                        case "mkdir":
+                            mkdirHelp();
+                            break;
+                        default:
+                            System.out.println("gsh: Error! Invalid command!");
+                            break;
+                    }
+                    if (tokens.isEmpty()) {
+                        break;
+                    }
+                    tokens.remove(0);
+                }
+            } else {
                 System.err.println("gsh: Error! Invalid statement!");              
             }
             if (tokens.isEmpty()) {
@@ -120,5 +169,19 @@ public class gsh {
                 break; 
             }
         }
+
+    }
+    // help functions
+    private static void cdHelp() {
+        System.out.println("cd: switch between directories.\nUsage: cd [directory]/cd\nIf used without arguments, the directory will change to the directory in which the program was launched.");
+    }
+    private static void echoHelp() {
+        System.out.println("echo: print a value to the console.\nUsage: echo [value]");
+    }
+    private static void historyHelp() {
+        System.out.println("history: print previously used commands in a session.\nUsage: history");
+    }
+    private static void mkdirHelp() {
+        System.out.println("mkdir: creates a directory.\nUsage: mkdir [path]");
     }
 }
