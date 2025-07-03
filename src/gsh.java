@@ -25,45 +25,44 @@ public class gsh {
         lex(line);
     }
     private static void lex(String line) {
-        ArrayList<String> result = new ArrayList<String>();
-        String z = "";
-        boolean ifString = false;
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
-            switch (c) {
-                case '(': case ')': case ';': case '=': case '+': case '-': case '*':case '{': case '}':case ':':
-                    if (!z.isEmpty()) {
-                        result.add(z);
-                        z = "";
-                    }
-                    result.add(String.valueOf(c));
-                    break;
-                case '"':
-                    if (!z.isEmpty() && ifString) {
-                        ifString = false;
-                        result.add(z);
-                        z = "";
-                    } else {
-                        ifString = true;
-                    }
-                    result.add("\"");
-                    break;
-                case ' ':
-                    if (!z.isEmpty() && !ifString) {
-                        result.add(z);
-                        z = "";
-                    } else if (ifString) {
-                        z += c;
-                    }
-                    break;
-                default:
-                    z += c;
-                    break;
-            }
-        }
-        if (!z.isEmpty()) {
-            result.add(z);
-        }
+		ArrayList<String> result = new ArrayList<String>();
+		String z = "";
+		boolean ifString = false;
+		for (int i = 0; i < line.length(); i++) {
+		    char c = line.charAt(i);		
+		    if (c == '"') {
+		        ifString = !ifString;
+		        if (!ifString) {
+		            result.add(z);
+		            z = "";
+		        }
+		    } else if (ifString) {
+		        z += c;
+		    } else {
+		        switch (c) {
+		            case '(': case ')': case ';': case '=': case '+':
+		            case '-': case '*': case '{': case '}': case ':':
+		                if (!z.isEmpty()) {
+		                    result.add(z);
+		                    z = "";
+		                }
+		                result.add(String.valueOf(c));
+		                break;
+		            case ' ':
+		                if (!z.isEmpty()) {
+		                    result.add(z);
+		                    z = "";
+		                }
+		                break;
+		            default:
+		                z += c;
+		                break;
+		        }
+		    }
+		}
+		if (!z.isEmpty()) {
+		    result.add(z);
+		}
         execute(result);
     }
     private static void execute(List<String> tokens) {
@@ -166,7 +165,7 @@ public class gsh {
                         System.out.println(i.getName());
                     }
                 }
-            }else {
+            } else {
                 System.err.println("gsh: Error! Invalid statement!");              
             }
             if (tokens.isEmpty()) {
