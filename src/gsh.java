@@ -31,7 +31,7 @@ public class gsh {
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
             switch (c) {
-                case '(': case ')': case ';': case '=': case '+': case '-': case '*': case '/':case '{': case '}':case ':':
+                case '(': case ')': case ';': case '=': case '+': case '-': case '*':case '{': case '}':case ':':
                     if (!z.isEmpty()) {
                         result.add(z);
                         z = "";
