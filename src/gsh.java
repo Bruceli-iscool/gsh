@@ -1,5 +1,5 @@
 import java.util.*;
-import java.io.File;
+import java.io.*;
 public class gsh {
     private static String currentDir = System.getProperty("user.dir");
     private static List<String> history = new ArrayList<>();
@@ -40,8 +40,7 @@ public class gsh {
 		        z += c;
 		    } else {
 		        switch (c) {
-		            case '(': case ')': case ';': case '=': case '+':
-		            case '-': case '*': case '{': case '}': case ':':
+		            case '(': case ')': case ';': case '=': case '+': case '*': case '{': case '}': case ':':
 		                if (!z.isEmpty()) {
 		                    result.add(z);
 		                    z = "";
@@ -166,20 +165,23 @@ public class gsh {
                     }
                 }
             } else {
-                System.err.println("gsh: Error! Invalid statement!");              
-            }
-            if (tokens.isEmpty()) {
-                break;
-            }
-            current = tokens.get(0);
-            tokens.remove(0);
-            if (current.matches(";")) {
-                continue;
-            } else {
-                break; 
+                try {
+                    // fix
+                    Process n = new ProcessBuilder(tokens).redirectErrorStream(true).start();
+                    Scanner r = new Scanner(new InputStreamReader(n.getInputStream()));
+                    while (r.hasNextLine()) {
+                        String line = r.nextLine();
+                        System.out.println(line);
+                    }
+                    n.waitFor();
+                    r.close();
+                } catch (IOException e) {
+                    System.err.println("gsh: Error! Invalid statement!");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
-
     }
     // help functions
     private static void cdHelp() {

@@ -15,3 +15,9 @@ To quit the program use:
 To get the license for the program use:
 
     license
+To run a script use:
+
+    ./script.gsh
+To run an application use:
+
+    appName
