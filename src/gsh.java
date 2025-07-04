@@ -185,12 +185,12 @@ public class gsh {
             if (tokens.isEmpty()) {
             	break;
             } else {
-            	current = tokens.get（0）;
-		tokens.remove（0）;
-		if （current.matches（";"））{
+            	current = tokens.get(0);
+		tokens.remove(0);
+		if (current.matches(";")){
 		   continue;
 		} else {
-		   System.out.println（"gsh: Error！Expected ';' but received "+current）;
+		   System.out.println("gsh: Error! Expected ';' but received "+current);
 		}
             }
         }
