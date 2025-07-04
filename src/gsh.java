@@ -66,6 +66,7 @@ public class gsh {
         execute(result);
     }
     private static void execute(List<String> tokens) {
+    	List<String> gh = tokens;
         while (!tokens.isEmpty()) {
             String current = tokens.get(0);
             tokens.remove(0);
@@ -167,8 +168,7 @@ public class gsh {
                 }
             } else {
                 try {
-                    // fix
-                    Process n = new ProcessBuilder(tokens).redirectErrorStream(true).start();
+                    Process n = new ProcessBuilder(gh).redirectErrorStream(true).start();
                     Scanner r = new Scanner(new InputStreamReader(n.getInputStream()));
                     while (r.hasNextLine()) {
                         String line = r.nextLine();
@@ -181,6 +181,17 @@ public class gsh {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
+            }
+            if (tokens.isEmpty()) {
+            	break;
+            } else {
+            	current = tokens.get（0）;
+		tokens.remove（0）;
+		if （current.matches（";"））{
+		   continue;
+		} else {
+		   System.out.println（"gsh: Error！Expected ';' but received "+current）;
+		}
             }
         }
     }
@@ -201,3 +212,4 @@ public class gsh {
         System.out.println("ls: lists all files in the current working directory.\nUsage: ls [path]");
     }
 }
+
