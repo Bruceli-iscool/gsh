@@ -65,133 +65,96 @@ public class gsh {
 		}
         execute(result);
     }
+    private static String pop(List<String> tokens) {
+        return tokens.isEmpty() ? null : tokens.remove(0);
+    }
     private static void execute(List<String> tokens) {
-    	List<String> gh = tokens;
+        List<String> gh = new ArrayList<>(tokens);
         while (!tokens.isEmpty()) {
-            String current = tokens.get(0);
-            tokens.remove(0);
+            String current = pop(tokens);
+            if (current == null) break;
             if (current.matches("license")) {
                 System.out.println("NO WARRANTY OF ANY KIND IS PROVIDED!\ngsh is licensed under the GNU General Public License (GPL) v2.0");
             } else if (current.matches("quit")) {
                 System.exit(0);
-            }else if (current.matches("echo")) {
-                if (tokens.isEmpty()) {
+            } else if (current.matches("echo")) {
+                current = pop(tokens);
+                if (current == null) {
                     System.err.println("gsh: Error! Expected value!");
                     break;
                 }
-                current = tokens.get(0);
-                tokens.remove(0);
                 System.out.println(current);
-            } else if (current.matches("history")){
-                for (String s:history) {
-                    System.out.println(s);
-                }
+            } else if (current.matches("history")) {
+                for (String s : history) System.out.println(s);
             } else if (current.matches("cd")) {
-	    		if (!tokens.isEmpty()) {
-	    			current= tokens.get(0);
-	    			tokens.remove(0);
-	    			if (current.matches(";")) {
-	    				currentDir = System.getProperty("user.dir");
-	    				continue;
-	    			} else {
-	    				File tempDir = new File(current);
-	    				if (!tempDir.isAbsolute()) {
-	    					tempDir = new File (currentDir +File.separator+current);
-	    				} 
-                        if (tempDir.exists()&&tempDir.isDirectory()) {
-                            currentDir = tempDir.getAbsolutePath();
-                        } else {
-	    					System.err.println("gsh: Error! "+current+" is not a valid directory!");
-	    					break;
-	    				}
-	    			}
-	    		} else {
-	    			currentDir = System.getProperty("user.dir");
-	    			break;
-	    		}
-	    	} else if (current.matches("mkdir")) {
-                if (tokens.isEmpty()) {
+                current = pop(tokens);
+                if (current == null || current.matches(";")) {
+                    currentDir = System.getProperty("user.dir");
+                    if (current == null) break;
+                    continue;
+                }
+                File tempDir = new File(current);
+                if (!tempDir.isAbsolute()) tempDir = new File(currentDir + File.separator + current);
+                if (tempDir.exists() && tempDir.isDirectory()) {
+                    currentDir = tempDir.getAbsolutePath();
+                } else {
+                    System.err.println("gsh: Error! " + current + " is not a valid directory!");
+                    break;
+                }
+            } else if (current.matches("mkdir")) {
+                current = pop(tokens);
+                if (current == null) {
                     System.out.println("gsh: Error! Expected argument!");
                     break;
-                } else {
-                    current = tokens.get(0);
-                    tokens.remove(0);
-                    File tempDir = new File(current);
-                    if (!tempDir.isAbsolute()) {
-                        tempDir = new File(currentDir + File.separator + tempDir);
-                    }
-                    if (tempDir.mkdir()) {
-                        
-                    } else {    
-                        System.out.println("gsh: Error! Directory not created!");
-                        break;
-                    }
+                }
+                File tempDir = new File(current);
+                if (!tempDir.isAbsolute()) tempDir = new File(currentDir + File.separator + tempDir);
+                if (!tempDir.mkdir()) {
+                    System.out.println("gsh: Error! Directory not created!");
+                    break;
                 }
             } else if (current.matches("help")) {
-                if (tokens.isEmpty()) {
+                current = pop(tokens);
+                if (current == null) {
                     System.out.println("gsh: Error! Usage help [command]");
                     break;
-                } else {
-                    current = tokens.get(0);
-                    switch (current) {
-                        case "cd":
-                            cdHelp();
-                            break;
-                        case "echo":
-                            echoHelp();
-                            break;
-                        case "history":
-                            historyHelp();
-                            break;
-                        case "mkdir":
-                            mkdirHelp();
-                            break;
-                        case "ls":
-                            lsHelp();
-                            break;
-                        default:
-                            System.out.println("gsh: Error! Invalid command!");
-                            break;
-                    }
-                    if (tokens.isEmpty()) {
-                        break;
-                    }
-                    tokens.remove(0);
+                }
+                switch (current) {
+                    case "cd": cdHelp(); break;
+                    case "echo": echoHelp(); break;
+                    case "history": historyHelp(); break;
+                    case "mkdir": mkdirHelp(); break;
+                    case "ls": lsHelp(); break;
+                    default: System.out.println("gsh: Error! Invalid command!"); break;
                 }
             } else if (current.matches("ls")) {
                 File tempDir = new File(currentDir);
                 File[] contents = tempDir.listFiles();
-                if (contents != null) {
-                    for (File i : contents) {
-                        System.out.println(i.getName());
-                    }
-                }
+                if (contents != null) for (File i : contents) System.out.println(i.getName());
             } else {
                 try {
-                    Process n = new ProcessBuilder(gh).redirectErrorStream(true).start();
-                    Scanner r = new Scanner(new InputStreamReader(n.getInputStream()));
-                    while (r.hasNextLine()) {
-                        String line = r.nextLine();
-                        System.out.println(line);
-                    }
-                    n.waitFor();
-                    r.close();
+                    ProcessBuilder pb = new ProcessBuilder(gh);
+                    pb.directory(new File(currentDir));
+                    pb.redirectErrorStream(true);
+                    Process process = pb.start();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    String line;
+                    while ((line = reader.readLine()) != null) System.out.println(line);
+                    reader.close();
+                    int exitCode = process.waitFor();
+                    if (exitCode != 0) System.err.println("gsh: Process exited with code " + exitCode);
                 } catch (IOException e) {
                     System.err.println("gsh: Error! Invalid statement!");
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
+                break;
             }
-            if (tokens.isEmpty()) {
-            	break;
-            } else {
-            	current = tokens.get(0);
-		tokens.remove(0);
-		if (current.matches(";")){
-		   continue;
-		} else {
-		   System.out.println("gsh: Error! Expected ';' but received "+current);
-		}
+            current = pop(tokens);
+            if (current == null) break;
+            if (!current.matches(";")) {
+                System.out.println("gsh: Error! Expected ';' but received " + current);
+                break;
             }
         }
     }
