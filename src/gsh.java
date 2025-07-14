@@ -136,11 +136,8 @@ public class gsh {
                     ProcessBuilder pb = new ProcessBuilder(gh);
                     pb.directory(new File(currentDir));
                     pb.redirectErrorStream(true);
+                    pb.inheritIO();
                     Process process = pb.start();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line;
-                    while ((line = reader.readLine()) != null) System.out.println(line);
-                    reader.close();
                     int exitCode = process.waitFor();
                     if (exitCode != 0) System.err.println("gsh: Process exited with code " + exitCode);
                 } catch (IOException e) {
