@@ -14,7 +14,6 @@ public class gsh {
             System.out.print("gsh@ "+currentDir+ "> ");
             String ans = getInput();
             interpret(ans);
-            
         }
     }
     public static String getInput() {
