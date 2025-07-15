@@ -2,13 +2,14 @@ import java.util.*;
 import java.io.*;
 
 public class gsh {
+    // todo add scripting
     private static String currentDir = System.getProperty("user.dir");
     private static List<String> history = new ArrayList<>();
     public static void main (String args[]) {
         shell();
     }
     private static void shell() {
-        System.out.println("gsh v0.1\nlicense for license or quit to exit the program or enter command.");
+        System.out.println("gsh v0.5\nlicense for license or quit to exit the program or enter command.");
         while (true) {
             System.out.print("gsh@ "+currentDir+ "> ");
             String ans = getInput();
