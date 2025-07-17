@@ -172,7 +172,7 @@ public class gsh {
         }
     }
     private static String readFile(String path) {
-        File f = new File(currentdir + path);
+        File f = new File(currentDir + path);
         String out = "";
         try (Scanner scanner = new Scanner(f)) {
             while (scanner.hasNextLine()) {
