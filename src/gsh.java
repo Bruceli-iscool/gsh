@@ -113,6 +113,22 @@ public class gsh {
                     System.out.println("gsh: Error! Directory not created!");
                     break;
                 }
+            } else if (current.matches("cat")) {
+                current = pop(tokens);
+                if (current == null) {
+                    System.out.println("gsh: Error! Expected argument!");
+                    break;
+                }
+                if (current.startsWith("-")) {
+                    //arguments
+                    if (current.matches("-n")) {
+                        //create new file
+                        break;
+                    }
+                } else {
+                    String content = readFile(current);
+                    System.out.println(content);
+                }
             } else if (current.matches("help")) {
                 current = pop(tokens);
                 if (current == null) {
@@ -155,6 +171,18 @@ public class gsh {
             }
         }
     }
+    private static String readFile(String path) {
+        File f = new File(currentdir + path);
+        String out = "";
+        try (Scanner scanner = new Scanner(f)) {
+            while (scanner.hasNextLine()) {
+                out += scanner; 
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return out;
+    } 
     // help functions
     private static void cdHelp() {
         System.out.println("cd: switch between directories.\nUsage: cd [directory]/cd\nIf used without arguments, the directory will change to the directory in which the program was launched.");
