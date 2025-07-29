@@ -1,0 +1,2 @@
+# gsh test
+cd /home/

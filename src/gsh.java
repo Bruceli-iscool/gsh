@@ -23,6 +23,9 @@ public class gsh {
     }
     public static void interpret(String line) {
         history.add(line);
+        if (line.startsWith("#")) {
+            return;
+        }
         lex(line);
     }
     private static void lex(String line) {
@@ -147,6 +150,11 @@ public class gsh {
                 File tempDir = new File(currentDir);
                 File[] contents = tempDir.listFiles();
                 if (contents != null) for (File i : contents) System.out.println(i.getName());
+            } else if (current.matches("./")){
+                // needs work
+                current = pop(tokens);
+                String content = readFile(current);
+                interpret(content);
             } else {
                 try {
                     ProcessBuilder pb = new ProcessBuilder(gh);
@@ -172,17 +180,17 @@ public class gsh {
         }
     }
     private static String readFile(String path) {
-        File f = new File(currentDir + path);
+        File f = new File(currentDir + File.separator + path);
         String out = "";
         try (Scanner scanner = new Scanner(f)) {
             while (scanner.hasNextLine()) {
-                out += scanner; 
+                out += scanner.nextLine() + System.lineSeparator();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         return out;
-    } 
+    }
     // help functions
     private static void cdHelp() {
         System.out.println("cd: switch between directories.\nUsage: cd [directory]/cd\nIf used without arguments, the directory will change to the directory in which the program was launched.");
